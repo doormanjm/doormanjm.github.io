@@ -1,334 +1,79 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Jost', sans-serif;
-    box-sizing: border-box;
-    background-color: #aaaaaa;
-    color: #000000;
-    font-family: 'Jost', sans-serif;
-    -ms-overflow-style: none; /* for Internet Explorer, Edge */
-    scrollbar-width: none; /* for Firefox */
-    overflow-y: scroll; 
-}
-body::-webkit-scrollbar {
-    display: none; /* for Chrome, Safari, and Opera */
-}
-main::-webkit-scrollbar {
-    display: none; /* for Chrome, Safari, and Opera */
-}
+var table = document.getElementById("table1");
+var url = "https://api.twilio.com/2010-04-01/Accounts/AC0cd0792faa0b9f0cfb05ff3b8143e3b7/Messages.json";
 
-.material-icons {
-    vertical-align: middle;
-    line-height: 1px;
-    cursor: pointer;
-}
+async function loadTable(url, table) {
+  var tableHead = table.querySelector("thead");
+  var tableBody = table.querySelector("tbody");
 
-.text-primary {
-    color: #ffffff;
-}
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", "Basic QUMwY2QwNzkyZmFhMGI5ZjBjZmIwNWZmM2I4MTQzZTNiNzpiZWFjN2YwOGM5OTI2OWViYjJjOWMyMzgyOGFhNmY5MA==");
 
-.text-blue {
-    color: #334be9;
-}
+  var formdata = new FormData();
 
-.text-red {
-    color: #d50000;
-}
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
 
-.text-green {
-    color: #2e7d32;
-}
+  try {
+    var response = await fetch(url, requestOptions);
+    var result = await response.json();
 
-.text-orange {
-    color: #ff6d00;
-}
+    // Clear existing table content
+    tableHead.innerHTML = "";
+    tableBody.innerHTML = "";
 
-.grid-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: .15fr 3fr;
-    grid-template-areas:
-        "header header header header"
-        "main main main main";
-    height: 100vh;
-}
-.grid-container.open {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: .2fr 3fr;
-    grid-template-areas:
-        "header header header header"
-        "main main main main";
-    height: 100vh;
-}
+    // Create table headers
+    var headerRow = document.createElement("tr");
+    var headers = ["Date", "Time", "To", "Body", "Status"];
 
-.header {
-    grid-area: header;
-    background-color: #2c6994;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 1;
-    padding: 0 10px 0 10px;
-    box-shadow: 0 6px 7px -4px rgba(0, 0, 0, 0.2);
+    headers.forEach(function(header) {
+      var th = document.createElement("th");
+      th.textContent = header;
+      headerRow.appendChild(th);
+    });
+
+    tableHead.appendChild(headerRow);
+
+    // Populate table rows with data
+    result.messages.forEach(function(message) {
+      var row = document.createElement("tr");
+
+      var dateSent = new Date(message.date_sent);
+      var formattedDate = dateSent.toLocaleDateString();
+      var formattedTime = dateSent.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+
+      var dateCell = document.createElement("td");
+      dateCell.textContent = formattedDate;
+      row.appendChild(dateCell);
+
+      var timeCell = document.createElement("td");
+      timeCell.textContent = formattedTime;
+      row.appendChild(timeCell);
+
+      var toCell = document.createElement("td");
+      toCell.textContent = message.to;
+      row.appendChild(toCell);
+
+      var bodyCell = document.createElement("td");
+      bodyCell.textContent = message.body;
+      row.appendChild(bodyCell);
+
+      var statusCell = document.createElement("td");
+      statusCell.textContent = message.status;
+      row.appendChild(statusCell);
+
+      tableBody.appendChild(row);
+    });
+
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-img {
-    padding: 5px;
-    margin: 5px;
-    height: 35px;
-}
+document.getElementById('table-button').addEventListener('click', function() {
+    loadTable(url, table);
+});
 
-.sidebar {
-    grid-area: main;
-    margin-top: -20px;
-    padding-top: 20px;
-    width: 250px;
-    height: 100%;
-    position: relative;
-    top: 0;
-    left: -257px;
-    background-color: #2c6994;
-    transition: left 0.3s ease-in-out;
-    box-shadow: 7px 8px 8px 0 rgba(0, 0, 0, 0.2);
-}
-
-.sidebar.open {
-    left: 0;
-}
-
-
-
-.list {
-    list-style-type: none;
-}
-
-.list-item {
-    display: inline-block;
-    vertical-align: center;
-    padding: 10px 10px 15px 0px;
-}
-
-a {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.menu {
-    grid-area: header;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.main-container {
-    grid-area: main;
-    overflow-y: auto;
-    position: relative;
-    padding: 20px 20px;
-    transition: left 0.3s ease-in-out;
-    left: 0;
-}
-
-.main-container.open{
-    left: 250px;
-}
-
-.main-title {
-    display: flex;
-    justify-content: space-between;
-}
-
-.main-title>p {
-    font-size: 20px;
-}
-
-.main-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.camera {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 25px;
-    background-color: #474f79;
-    resize: vertical;
-    border-left: 7px solid #2c6994;
-    box-sizing: border-box;
-    border-radius: 5px;
-    box-shadow: 0 6px 7px -4px rgba(0, 0, 0, 0.2);
-}
-
-.card>span {
-    font-size: 30px;
-    font-weight: 600;
-}
-
-.card-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.camera-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.camera-inner>h1 {
-    font-size: 23px;
-    font-weight: 600;
-}
-
-.card-inner>p {
-    font-size: 23px;
-    font-weight: 600;
-}
-
-video {
-    justify-content: center;
-}
-
-.icon {
-    width: 48px;
-    height: 48px;
-    margin: 5px;
-}
-
-.icon-shape {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    border-radius: 50%;
-}
-
-.camera-icons{
-    display: inline-block;
-    vertical-align: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    border-radius: 50%;
-}
-
-.photo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 5px;
-}
-
-hr.solid {
-    width: 100%;
-    border: 2px solid #252525;
-}
-
-.charts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.charts-card {
-    background-color: #474f79;
-    padding: 25px;
-    border-left: 7px solid #2c6994;
-    box-sizing: border-box;
-    -webkit-column-break-inside: avoid;
-    border-radius: 5px;
-    box-shadow: 0 6px 7px -4px rgba(0, 0, 0, 0.2);
-}
-
-.chart-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: 600;
-    color: #000000;
-}
-
-textarea {
-    width: 100%;
-    height: 100%;
-    resize: both;
-    overflow: auto;
-}
-
-.table {
-    border-collapse: collapse;
-    margin: 25px;
-    font-size: .9em;
-    min-width: 400px;
-    border-radius: 5px 5px 0 0;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
-
-.table > thead tr{
-    background-color: #6f91aa;
-    color:#ffffff;
-    text-align: center;
-    font-weight: bold;
-}
-
-.table tr,  
-.table td{
-    padding: 10px 10px;
-}
-
-.table > tbody tr {
-    border-bottom: 1px solid #d6d6d6
-}
-
-.table > tbody tr:nth-of-type(even) {
-    background-color: #aaaaaa;
-}
-.table > tbody tr:nth-of-type(odd) {
-    background-color: #dddddd;
-}
-.table > tbody tr:last-of-type {
-    border-bottom: 2px solid #6f91aa;
-}
-
-
-
-@media screen and (max-width: 768px) {
-    .main-cards {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        margin-bottom: 0;
-    }
-
-    .charts {
-        max-width: 100vw;
-        grid-template-columns: 1fr;
-        margin-top: 30px;
-    }
-
-    .header-left {
-        display: none;
-    }
-}
+loadTable(url, table);
