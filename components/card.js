@@ -1,6 +1,6 @@
 var myHeaders = new Headers();
-myHeaders.append("clientId", "4b385094-e6ed-4f7c-94ed-9c0772a134ce");
-myHeaders.append("Authorization", "Basic cXVhbnR1bStGQkRyVThBZFFvdlJmdWgxOlRyNmk2dlJ6RnRCaklYbXU=");
+myHeaders.append("clientId", );
+myHeaders.append("Authorization",);
 
 var requestOptions = {
   method: 'GET',
